@@ -6,3 +6,6 @@ edition = "2018"
 
 [dependencies]
 linefeed = "0.6.0"
+reqwest = "0.9.16"
+serde_json = "1.0.39"
+structopt = "0.2.15"
