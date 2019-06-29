@@ -105,6 +105,11 @@ pub fn user_def() -> ValidatingEntryType {
             return Err("User name string too long".into());
           }
           
+          // user name string length should not be empty
+          if user.name.is_empty() {
+            return Err("User name string cannot be empty".into());
+          }
+          
           // user can only register themself
           if !validation_data.sources().contains(&user.agent) {
             return Err("Cannot register a user from another agent".into());
