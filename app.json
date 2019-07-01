@@ -1,0 +1,14 @@
+{
+  "name": "Holochain Mutual Credit Clearing",
+  "description": "Mutual credit clearing implementation",
+  "authors": [
+    {
+      "identifier": "Nick <v4narchist@gmail.com>",
+      "public_key_source": "",
+      "signature": ""
+    }
+  ],
+  "version": "0.1.0",
+  "dht": {},
+  "properties": null
+}
