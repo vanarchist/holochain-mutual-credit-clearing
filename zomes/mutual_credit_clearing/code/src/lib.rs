@@ -6,19 +6,17 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 #[macro_use]
-extern crate holochain_core_types_derive;
+extern crate holochain_json_derive;
 
 extern crate hdk_proc_macros;
 use hdk_proc_macros::zome;
 
 use hdk::{
   error::ZomeApiResult,
-  AGENT_ADDRESS,
   entry_definition::ValidatingEntryType,
-};
-use hdk::holochain_core_types::{
-  cas::content::Address,
-  entry::Entry,
+  holochain_persistence_api::{
+    cas::content::{Address},
+  }
 };
 
 mod user;
