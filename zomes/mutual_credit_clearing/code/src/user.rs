@@ -1,3 +1,10 @@
+//
+// For this minimal implementation, a holochain agent id is tied to a user.
+// The relationship is one-to-one, you can only have one user per agent. There
+// is no verification that each agent is actually a unique person. So a person
+// could still create multiple users by running multiple agents. 
+// 
+
 use std::convert::TryFrom;
 use hdk::{
   AGENT_ADDRESS,
@@ -102,35 +109,33 @@ pub fn user_def() -> ValidatingEntryType {
     description: "Represents an agent registered on the network",
     sharing: Sharing::Public, 
     validation_package: || {
-      hdk::ValidationPackageDefinition::Entry
+      hdk::ValidationPackageDefinition::ChainFull
     },
     validation: | validation_data: hdk::EntryValidationData<User>| {
       match validation_data {
         // only match if the entry is being created (not modified or deleted)
         EntryValidationData::Create{ entry, validation_data } => {
           let user = User::from(entry);
-          let mut local_chain = validation_data.package.source_chain_entries;
           
-          // TODO: not working
-          if local_chain.is_some() {
-            validate_user_not_registered(local_chain.unwrap(), &user.agent)?;
-          }
+          // get full chain
+          let local_chain = validation_data.clone().package.source_chain_entries
+            .ok_or("Could not retrieve source chain")?;
           
+          hdk::debug(format!("{:?}", local_chain))?;
+          
+          // validate that agent has not registered a user yet
+          validate_user_not_registered(local_chain, &user.agent)?;
+          
+          // validate user name string
           validate_user_name(&user.name)?;
           
-          // user can only register themselves
-          //if !validation_data.sources().contains(&user.agent) {
-          //  return Err("Cannot register a user from another agent".into());
-          //}
+          // validate creating agent is specified agent
+          // not sure this is really needed, how would this condition arise?
+          if !validation_data.sources().contains(&user.agent) {
+            return Err("Cannot register a user from another agent".into());
+          }
           
-          // ** LOOK INTO THIS **
-          // Sometimes the validating entry is already in the chain when validation runs,
-          // To make our state reduction work correctly this must be removed
-          //local_chain.remove_item(&Entry::App("user".into() , user.clone().into()));
-          // TODO: finish this
-          
-          
-          // otherwise no problems
+          // if made it here, no problems
           Ok(())
         },
         _ => {
@@ -208,7 +213,7 @@ pub fn validate_user_not_registered(local_chain: Vec<Entry>, agent_address: &Add
       }
     })
     .any(|user| user.agent == agent_address.to_owned());
-    
+  
   if found {
     Err("Agent can only register once".into())
   }
@@ -275,5 +280,4 @@ pub mod tests {
   }
 
 }
-
 
