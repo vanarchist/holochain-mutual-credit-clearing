@@ -19,8 +19,8 @@ Communication with the holochain node can be made with the appropriate JSON RPC 
 
 ## Tests
 ### Unit Tests
-Unit tests have been written in rust using the cargo test framework. These tests are particularly important for ensuring correctness of the validation logic. The unit tests can be run by changing to the ```zomes/mutual_credit_clearing/code/``` directory and running ```cargo test```.
+Unit tests are written in rust using the cargo test framework. These tests are particularly important for ensuring correctness of the validation logic. The unit tests can be run by changing to the ```zomes/mutual_credit_clearing/code/``` directory and running ```cargo test```.
 
 ### End-To-End Tests
-End-to-end tests have been written in javascript using the holochain diorama test framework. These tests are important for ensuring correctness of the application on the level of actual interacting users. The end-to-end tests can be run by issuing the command ```
+End-to-end tests are written in javascript using the holochain diorama test framework. These tests are important for ensuring correctness of the application on the level of actual interacting users. The end-to-end tests can be run by issuing the command ```
 hc test``` from the project root directory.
