@@ -13,8 +13,8 @@ const dna = Diorama.dna(dnaPath, 'holochain-mutual-credit-clearing')
 
 const diorama = new Diorama({
   instances: {
-    alice: dna,
-    bob: dna,
+    amy: dna,
+    brad: dna,
   },
   bridges: [],
   debugLog: false,
