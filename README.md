@@ -11,8 +11,13 @@ Holochain is agent-centric and eventually consistent which means viewing the led
 ## Design
 The architecture is based on a countersigning pattern. More details and diagrams are forthcoming.
 
-## Tests
+## Running
+### Back End
+Start the holochain node for the application by running ```holochain -c ./conductor-config.toml``` from the project root directory.
+### Front End
+Communication with the holochain node can be made with the appropriate JSON RPC calls from the tools of your choosing. As an example, a command line interface is included in the project. You can run the command line interface by changing to the ```examples/cli-example/``` directory and issuing the command ```cargo run http://localhost:8888 instance1```.
 
+## Tests
 ### Unit Tests
 Unit tests have been written in rust using the cargo test framework. These tests are particularly important for ensuring correctness of the validation logic. The unit tests can be run by changing to the ```zomes/mutual_credit_clearing/code/``` directory and running ```cargo test```.
 
