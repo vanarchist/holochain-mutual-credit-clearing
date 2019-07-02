@@ -8,6 +8,9 @@ This project was inspired by Thomas Greco's book, *The End of Money and the Futu
 
 Holochain is agent-centric and eventually consistent which means viewing the ledger like what is shown in the table above is not quite the right way to look at things. That kind of global state implies agreement of every agent on the balance of every agent and transaction ordering which would require consensus. Instead, each agent (Amy, Brad, Carl, and Doris in the table) will have their own perspective on the balance of other agents.
 
+## Design
+The architecture is based on a countersigning pattern. More details and diagrams are forthcoming.
+
 ## Tests
 
 ### Unit Tests
