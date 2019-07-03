@@ -16,6 +16,28 @@ The architecture is based on a countersigning pattern. More details and diagrams
 Start the holochain node for the application by running ```holochain -c ./conductor-config.toml``` from the project root directory.
 ### Front End
 Communication with the holochain node can be made with the appropriate JSON RPC calls from the tools of your choosing. As an example, a command line interface is included in the project. You can run the command line interface by changing to the ```examples/cli-example/``` directory and issuing the command ```cargo run http://localhost:8888 instance1```.
+#### Example Command Line Interface
+After starting the interface you will be greeted with the following prompt.
+```
+######################################################################
+CLI example for holochain mutual credit clearing library.
+Enter "help" for a list of commands.
+Press Ctrl-D or enter "quit" to exit.
+######################################################################
+
+
+>
+```
+In order to transact with others on the credit clearing network, you need to register yourself as a user. Enter the command ```register``` with the user name of your choosing such as ```register Amy```. Next, we'll need to create another user to transact with. Open a new terminal and run the command ```cargo run http://localhost:8888 instance2``` from the ```examples/cli-example/``` directory to connect to another instance. At the prompt register another user. Here we'll do ```register Brad```.
+
+To see a list of registered users, enter the command ```get_users```. You should see the following output:
+```
+Registered users: 
+
+[QmSbkMsSMAgHEsdyT2pyAGsw4xh79nEfnB3WqERyMNEWn4] : { Agent: "HcScjcgKqXC5pmfvka9DmtEJwVr548yd86UPtJGGoue9ynuikuRTN7oE5zcjgbi", Name: "Amy" }
+[QmUZruhfdzXE5zmixSBwyV7qV6Bsv9TVrNeGzfgondanZQ] : { Agent: "HcScidPSdAT43q9qirJwt5rHJYjjsvougV3jgSBwdJujszw3bBu5Mktr74Rgnea", Name: "Brad" }
+```
+The hash in [] is the user entry hash which is what we'll use when making transactions. 
 
 ## Tests
 ### Unit Tests
