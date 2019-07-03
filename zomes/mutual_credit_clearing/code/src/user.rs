@@ -80,7 +80,7 @@ pub fn handle_create_user(name: String) -> ZomeApiResult<Address> {
     USER_REGISTRATION_LINK, 
     ""
   )?;
-    
+  
   Ok(user_address)
 }
 
@@ -115,6 +115,11 @@ pub fn user_def() -> ValidatingEntryType {
       match validation_data {
         // only match if the entry is being created (not modified or deleted)
         EntryValidationData::Create{ entry, validation_data } => {
+    
+          // need to find out what context this was called from
+          // so we know what to expect on the local chain
+          let lifecycle = validation_data.clone().lifecycle;
+          
           let user = User::from(entry);
           
           // get full chain
@@ -124,7 +129,7 @@ pub fn user_def() -> ValidatingEntryType {
           hdk::debug(format!("{:?}", local_chain))?;
           
           // validate that agent has not registered a user yet
-          validate_user_not_registered(local_chain, &user.agent)?;
+          validate_user_not_registered(local_chain, &user.agent, lifecycle)?;
           
           // validate user name string
           validate_user_name(&user.name)?;
@@ -197,7 +202,7 @@ pub fn validate_user_name(name: &String) -> Result<(), String> {
 }
 
 // check if user has already been registered for agent
-pub fn validate_user_not_registered(local_chain: Vec<Entry>, agent_address: &Address) -> Result<(), String> {
+pub fn validate_user_not_registered(local_chain: Vec<Entry>, agent_address: &Address, lifecycle: hdk::EntryLifecycle) -> Result<(), String> {
   let found =
   local_chain
     .iter()
@@ -214,13 +219,18 @@ pub fn validate_user_not_registered(local_chain: Vec<Entry>, agent_address: &Add
     })
     .any(|user| user.agent == agent_address.to_owned());
   
-  if found {
-    Err("Agent can only register once".into())
+  match lifecycle {
+    hdk::EntryLifecycle::Chain => {
+      if found {
+        return Err("Agent can only register once".into());
+      }
+    }
+    _ => {}
   }
-  else {
-    Ok(())
-  }
+          
+  Ok(())
 }
+
 
 #[cfg(test)]
 pub mod tests {
@@ -228,7 +238,7 @@ pub mod tests {
   use super::*;
   
   use hdk::{
-    holochain_core_types::{entry::test_entry, entry::Entry},
+    holochain_core_types::{entry::Entry},
     holochain_persistence_api::{
       cas::content::{Address},
     },
@@ -246,7 +256,6 @@ pub mod tests {
   
   #[test]
   fn validate_user_not_registered_yes() {
-    let entry = test_entry();
     let addr = Address::from("test_addr");
     let user = User { 
       agent: addr.clone(),
@@ -258,12 +267,12 @@ pub mod tests {
     );
     let mut registered_users = Vec::new();
     registered_users.push(entry);
-    assert!(validate_user_not_registered(registered_users, &addr).is_err())
+    assert!(validate_user_not_registered(registered_users, &addr, 
+            hdk::EntryLifecycle::Chain).is_err())
   }
   
   #[test]
   fn validate_user_not_registered_no() {
-    let entry = test_entry();
     let addr1 = Address::from("test_addr1");
     let addr2 = Address::from("test_addr2");
     let user = User { 
@@ -276,7 +285,8 @@ pub mod tests {
     );
     let mut registered_users = Vec::new();
     registered_users.push(entry);
-    assert!(validate_user_not_registered(registered_users, &addr2).is_ok())
+    assert!(validate_user_not_registered(registered_users, &addr2,
+            hdk::EntryLifecycle::Chain).is_ok())
   }
 
 }
