@@ -35,5 +35,44 @@ module.exports = scenario => {
                 }],
                 "Brad sees Amy in the registered users"
                )
+    
+    // Amy tries registering again
+    const amy_dup = await amy.callSync("mutual_credit_clearing", "create_user", {name: "Amy"})
+    t.equal(amy_dup.Ok, undefined, "Amy tries to register again")
+    
+    // Brad tries registering without specifing a user name
+    const brad_empty = await brad.callSync("mutual_credit_clearing", "create_user", {name:""})
+    t.equal(brad_empty.Ok, undefined, "Brad tries registering with empty string")
+    
+    // Brad tries registering with long user name
+    const brad_long = await brad.callSync("mutual_credit_clearing", "create_user", {name:"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"})
+    t.equal(brad_long.Ok, undefined, "Brad tries registering with long name")     
+    
+    // register brad as a user
+    const brad_addr = await brad.callSync("mutual_credit_clearing", "create_user", {name: "Brad"})
+    t.equal(brad_addr.Ok.length, 46, "Brad was registered successfully")
+    
+    // check that amy sees herself and brad as registered users
+    const registered_amy = await amy.callSync("mutual_credit_clearing", "get_users", {});
+    t.equal(registered_amy.Ok.length, 2, "Amy sees two users")
+    t.deepEqual(registered_amy.Ok,
+                [{
+                  entry: {
+                    name: "Amy",
+                    agent: amy.agentId
+                  },
+                  address: registered_amy.Ok[0].address
+                  },
+                  {
+                  entry: {
+                    name: "Brad",
+                    agent: brad.agentId
+                  },
+                  address: registered_amy.Ok[1].address
+                  }
+                ],
+                "Amy sees herself and Brad"
+               )
+    
   })
 }
