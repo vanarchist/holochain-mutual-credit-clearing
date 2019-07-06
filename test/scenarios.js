@@ -3,6 +3,10 @@ module.exports = scenario => {
     // user list empty to start
     const users = await amy.callSync("mutual_credit_clearing", "get_users", {});
     t.equal(users.Ok.length, 0, "User list empty to start")
+    
+    // amy does not get user addr prior to registration
+    const amy_no_usr = await amy.callSync("mutual_credit_clearing", "get_my_user", {});
+    t.equal(amy_no_usr.Ok, undefined, "Amy can't get user address because not registered")
   
     // register amy as a user
     const amy_addr = await amy.callSync("mutual_credit_clearing", "create_user", {name: "Amy"})
@@ -73,6 +77,17 @@ module.exports = scenario => {
                 ],
                 "Amy sees herself and Brad"
                )
+  
+    // check that brad can get his user address
+    const brad_usr_addr = await brad.callSync("mutual_credit_clearing", "get_my_user", {});
+    t.equal(brad_usr_addr.Ok.length, 46, "Returned brad's address")
+    t.equal(brad_usr_addr.Ok, brad_addr.Ok, "Brad's returned address is correct")
+  
+    // check that amy can get her user address
+    const amy_usr_addr = await amy.callSync("mutual_credit_clearing", "get_my_user", {});
+    t.equal(amy_usr_addr.Ok.length, 46, "Returned amy's address")
+    t.equal(amy_usr_addr.Ok, amy_addr.Ok, "Amy's returned address is correct")
+  
     
   })
 }
