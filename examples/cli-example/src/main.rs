@@ -14,8 +14,11 @@ struct Cli {
 }
 
 static COMMANDS: &[(&str, &str)] = &[
-  ("register", "Register as a participant of the credit clearing network. Usage: register <name>"),
+  ("register", "Register on the credit clearing network. Usage: register <name>"),
   ("get_users", "Get all registered users of the credit clearing network."),
+  ("get_my_user", "Get the address of your user registration entry"),
+  ("transfer", "Transfer units to user. Usage: transfer <amount> <from> <to>"),
+  ("balance", "Display user account balance and transaction history"),
   ("help", "Displays this the help page"),
   ("exit", "Exit this CLI."),
 ];
@@ -33,6 +36,14 @@ fn main() -> io::Result<()> {
                                            cli.instance.clone(), 
                                            "mutual_credit_clearing".into(), 
                                            "get_users".into());
+  let get_my_user = holochain_call_generator(cli.url.clone(), 
+                                             cli.instance.clone(), 
+                                             "mutual_credit_clearing".into(), 
+                                             "get_my_user".into());
+  let _transfer = holochain_call_generator(cli.url.clone(), 
+                                           cli.instance.clone(), 
+                                           "mutual_credit_clearing".into(), 
+                                           "transfer".into());
 
   let interface = Interface::new("Holochain mutual credit clearing CLI")?;
   
@@ -71,6 +82,20 @@ fn main() -> io::Result<()> {
                    r["entry"]["agent"], 
                    r["entry"]["name"]);
         });
+        println!("\n");
+        Ok(())
+      }
+      "get_my_user" => {
+        match get_my_user(json!({})) {
+          Ok(address) => {
+            println!("My user address: \n");
+            println!("{}", address);
+          }
+          Err(_e) => {
+            println!("No user address found");
+          }
+        }
+        
         println!("\n");
         Ok(())
       }
