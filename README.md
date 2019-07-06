@@ -10,7 +10,7 @@ Holochain is agent-centric and eventually consistent which means viewing the led
 
 ## Design
 
-On holochain, each agent has a local hashchain, which is a type of Directed Acyclic Graph (DAG). Agents commit entries to their local chain which are then replicated and validated by peers via a Distributed Hash Table (DHT). 
+With holochain, each agent has a local hashchain, which is a type of Directed Acyclic Graph (DAG). Agents commit entries to their local chain which are then replicated and validated by peers via a Distributed Hash Table (DHT). 
 
 ### Countersigning
 Countersigning is a way to validate an entry of another agent by signing it with your public key and vice versa. In the DevCamp [generic game framework](https://github.com/holochain-devcamp/generic-game), this was done with some significant constraints. The framework allowed for turn based games between two players where an agent could add a single move to their chain and not anymore until the other player validated it and signed it in their chain. A credit clearing currency transaction is between two agents but each agent can have a history of transactions with other agents. 
