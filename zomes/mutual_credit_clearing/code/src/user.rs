@@ -9,7 +9,7 @@ use std::convert::TryFrom;
 use hdk::{
   AGENT_ADDRESS,
   entry_definition::ValidatingEntryType,
-  error::ZomeApiResult,
+  error::{ZomeApiResult, ZomeApiError},
   holochain_persistence_api::{
     cas::content::{AddressableContent, Address},
   },
@@ -101,6 +101,32 @@ pub fn handle_get_users() -> ZomeApiResult<Vec<GetResponse<User>>> {
       GetResponse{entry: user, address}
     }).collect()
   )
+}
+
+// get user address associated with this agentid if it exists
+pub fn get_my_user() -> ZomeApiResult<Address> {
+  let anchor_address = Entry::App(
+    USER_ANCHOR.into(),
+    USER_ANCHOR_ENTRY.into()
+  ).address();
+    
+  let found =
+    hdk::utils::get_links_and_load_type(
+      &anchor_address, 
+      LinkMatch::Exactly(USER_REGISTRATION_LINK), // the link type to match
+      LinkMatch::Any
+    )?.into_iter().map(|user: User| {
+      user }).find(|user| user.agent == AGENT_ADDRESS.to_string().into());
+  
+  match found {
+    Some(user) => {
+      let address = Entry::App(USER_ENTRY_TYPE_NAME.into(), user.clone().into()).address();
+      Ok(address)
+    },
+    None => {
+      Err(ZomeApiError::HashNotFound)
+    }
+  }
 }
 
 pub fn user_def() -> ValidatingEntryType {

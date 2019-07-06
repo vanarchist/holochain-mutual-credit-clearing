@@ -16,7 +16,10 @@ use hdk::{
   entry_definition::ValidatingEntryType,
   holochain_persistence_api::{
     cas::content::{Address},
-  }
+  },
+  holochain_json_api::{
+    json::JsonString
+  },
 };
 
 mod user;
@@ -29,6 +32,15 @@ pub mod main {
   #[genesis]
   pub fn genesis() {
     Ok(())
+  }
+  
+  /*=========================================
+  =     Node-To-Node Messaging Receive      =
+  =========================================*/
+  
+  #[receive]
+  fn receive(_sender: Address, _data: String) {
+    "hello".to_string()
   }
 
   /*=========================================
@@ -57,6 +69,11 @@ pub mod main {
   #[zome_fn("hc_public")]
   fn get_users() -> ZomeApiResult<Vec<GetResponse<User>>> {
     user::handle_get_users()
+  }
+  
+  #[zome_fn("hc_public")]
+  fn get_my_user() -> ZomeApiResult<Address> {
+    user::get_my_user()
   }
   
 }
