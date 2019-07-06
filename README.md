@@ -9,7 +9,27 @@ This project was inspired by Thomas Greco's book, *The End of Money and the Futu
 Holochain is agent-centric and eventually consistent which means viewing the ledger like what is shown in the table above is not quite the right way to look at things. That kind of global state implies agreement of every agent on the balance of every agent and transaction ordering which would require consensus. Instead, each agent (Amy, Brad, Carl, and Doris in the table) will have their own perspective on the balance of other agents.
 
 ## Design
-The architecture is based on a countersigning pattern. More details and diagrams are forthcoming.
+
+On holochain, each agent has a local hashchain, which is a type of Directed Acyclic Graph (DAG). Agents commit entries to their local chain which are then replicated and validated by peers via a Distributed Hash Table (DHT). 
+
+### Countersigning
+Countersigning is a way to validate an entry of another agent by signing it with your public key and vice versa. In the DevCamp [generic game framework](https://github.com/holochain-devcamp/generic-game), this was done with some significant constraints. The framework allowed for turn based games between two players where an agent could add a single move to their chain and not anymore until the other player validated it and signed it in their chain. A credit clearing currency transaction is between two agents but each agent can have a history of transactions with other agents. 
+
+### Discovery
+When an agent commits an entry to their local chain, the intended counterparty does not automatically know about it. It is published to the DHT for replication and validation by peers. In the generic game framework, when an agent attempts to make a move, it first checks that the other agent has committed a move, then validates it and signs it into the local chain. That type of discovery doesn't work well for a currency transaction. Instead, node-to-node messaging will be used to notify the counterparty that a transaction is waiting for them to sign. 
+
+### State Reduction
+In order to determine the current balance of a user's account, the history of transactions in the chain are analyzed. The balance itself is not stored in the chain.
+
+### Simplifications
+As this project is primarily a learning exercise and limited in scope (for now at least), the following design constraints were used:
+
+* Only transaction supported is to transfer credits from one user to another
+* Validate only direct counterparty chain, not all possible linked child chains
+* Do not allow agents to transact again until counterparty signature resolves
+
+There are some consequences of these constraints that probably make this implementation not too useful outside of being a toy learning exercise. If you have a malicious counterparty or someone who leaves the network without returning you will not be able to transact in the event you had a pending transaction that was waiting on countersigning. Additionally, this design does not attempt to mitigate all the various attack vectors that could be possible.
+
 
 ## Running
 ### Back End
